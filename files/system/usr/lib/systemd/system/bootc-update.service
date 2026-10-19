@@ -1,0 +1,11 @@
+[Unit]
+Description=Stage bootc update
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bootc update
+
+[Install]
+WantedBy=multi-user.target
