@@ -22,14 +22,10 @@ modules:
       packages:
         - gnome-software
 
-  # Set up repositories (RPM Fusion for Codecs & VS Code)
+  # Set up repositories (RPM Fusion for Codecs)
   - type: dnf
     repos:
       nonfree: rpmfusion
-      files:
-        - https://packages.microsoft.com/yumrepos/vscode/vscode.repo
-      keys:
-        - https://packages.microsoft.com/keys/microsoft.asc
 
   # Install additional packages
   - type: dnf
