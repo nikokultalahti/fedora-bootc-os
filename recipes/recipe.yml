@@ -143,6 +143,11 @@ modules:
       disabled:
         # stock timer applies updates and reboots; we only stage
         - bootc-fetch-apply-updates.timer
+      masked:
+        # Fails on composefs roots: the installer writes a '/' entry in
+        # /etc/fstab and the unit can't remount the overlay root.
+        # See bootc-dev/bootc#971 and fedora-silverblue/issue-tracker#605
+        - systemd-remount-fs.service
     user:
       enabled:
         - podman.socket
