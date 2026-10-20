@@ -46,6 +46,7 @@ modules:
         - gnome-system-monitor
         - gnome-weather
         - loupe
+        - malcontent-control
         - papers
         - papers-nautilus
         - showtime
