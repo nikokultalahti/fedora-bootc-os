@@ -99,6 +99,7 @@ modules:
         - mozilla-openh264
         - plymouth # For graphical boot screen and encryption password promt
         - chezmoi
+        - adw-gtk3-theme
 
   # Homebrew with daily self-update and package upgrades
   - type: brew
