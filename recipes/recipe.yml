@@ -99,8 +99,6 @@ modules:
         - mozilla-openh264
         - plymouth # For graphical boot screen and encryption password promt
         - chezmoi
-        - adw-gtk3-theme
-        - gnome-tweaks
 
   # Homebrew with daily self-update and package upgrades
   - type: brew
@@ -124,6 +122,7 @@ modules:
           - org.gnome.Firmware
           - com.github.tchx84.Flatseal
           - io.github.flattool.Warehouse
+          - page.tesk.Refine
           - com.mattjakeman.ExtensionManager
           - io.github.flattool.Ignition
           - io.github.getnf.embellish
