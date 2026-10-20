@@ -119,6 +119,14 @@ modules:
           title: Flathub
         install:
           - io.github.kolunmi.Bazaar
+          - org.gnome.Firmware
+          - com.github.tchx84.Flatseal
+          - io.github.flattool.Warehouse
+          - page.tesk.Refine
+          - com.mattjakeman.ExtensionManager
+          - io.github.flattool.Ignition
+          - io.github.getnf.embellish
+          - com.tomjwatson.Emote
           - org.gnome.Boxes
           # replacements for apps excluded from the GNOME group
           - org.gnome.TextEditor
