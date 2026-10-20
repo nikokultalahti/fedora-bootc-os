@@ -1,47 +1,110 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
 name: fedora-bootc-os
-description: This is my personal OS image.
+description: Minimal GNOME desktop on Fedora bootc with podman, Boxes, Homebrew and Flathub apps.
 
 base-image: quay.io/fedora/fedora-bootc
-image-version: latest
+image-version: "44"
 
 modules:
-   # Copy system files (including systemd units for bootc updates)
+  # Systemd units for staged bootc updates
   - type: files
     files:
       - source: system
         destination: /
 
-  # Install GNOME desktop, remove GNOME Software
-  - type: dnf
-    group-install:
-      packages:
-        - gnome-desktop
-    remove:
-      packages:
-        - gnome-software
-
-  # Set up repositories (RPM Fusion for Codecs)
+  # RPM Fusion (free + nonfree)
   - type: dnf
     repos:
       nonfree: rpmfusion
 
-  # Install additional packages
+  # Minimal GNOME: the Fedora gnome-desktop group (with its recommended
+  # packages, as on Fedora Workstation) minus user applications.
+  # Group members and weak deps are both excluded by name.
+  - type: dnf
+    group-install:
+      exclude:
+        # apps (get them from Flathub via Bazaar)
+        - gnome-software
+        - gnome-text-editor
+        - yelp
+        - baobab
+        - decibels
+        - gnome-boxes
+        - gnome-calculator
+        - gnome-calendar
+        - gnome-characters
+        - gnome-clocks
+        - gnome-connections
+        - gnome-contacts
+        - gnome-font-viewer
+        - gnome-logs
+        - gnome-maps
+        - gnome-system-monitor
+        - gnome-weather
+        - loupe
+        - papers
+        - papers-nautilus
+        - showtime
+        - snapshot
+        - simple-scan
+        # setup, docs, sharing, extras
+        - gnome-initial-setup
+        - gnome-tour
+        - gnome-user-docs
+        - gnome-user-share
+        - gnome-remote-desktop
+        - rygel
+        - gnome-classic-session
+        - PackageKit-command-not-found
+        - PackageKit-gtk3-module
+      packages:
+        - gnome-desktop
+
+  # Things neither the group nor the bootc base provide
+  - type: dnf
+    install:
+      packages:
+        - flatpak
+        - google-noto-color-emoji-fonts
+        - glibc-all-langpacks
+
+  # Firefox as RPM
   - type: dnf
     install:
       packages:
         - firefox
-        - chezmoi
 
-  # Install Homebrew with daily auto-updates
+  # Codecs and AMD hardware video acceleration (RPM Fusion)
+  - type: dnf
+    group-install:
+      install-weak-deps: false
+      exclude:
+        - PackageKit-gstreamer-plugin
+      packages:
+        - multimedia
+    install:
+      packages:
+        - ffmpeg
+        - ffmpeg-libs
+        - mesa-va-drivers-freeworld
+        - libva
+        - libva-utils
+        # OpenH264 for Firefox (Cisco repo is enabled by default in Fedora)
+        - openh264
+        - gstreamer1-plugin-openh264
+        - mozilla-openh264
+
+  # Homebrew with daily self-update and package upgrades
   - type: brew
     auto-update: true
     auto-upgrade: true
-    update-interval: "1d"
-    upgrade-interval: "1d"
+    update-interval: 1d
+    upgrade-interval: 1d
+    update-wait-after-boot: 10m
+    upgrade-wait-after-boot: 30m
 
-  # Install default flatpaks from Flathub
+  # All GUI apps come from Flathub
   - type: default-flatpaks
     configurations:
       - scope: system
@@ -50,19 +113,39 @@ modules:
           name: flathub
           title: Flathub
         install:
-          - io.github.kolunmi.Bazaar # Bazaar
-          - org.gnome.Firmware # Firmware
+          - io.github.kolunmi.Bazaar
+          - org.gnome.Boxes
+          # replacements for apps excluded from the GNOME group
+          - org.gnome.TextEditor
+          - io.missioncenter.MissionCenter
+          - org.gnome.Loupe
+          - org.gnome.baobab
+          - org.gnome.Papers
+          - org.gnome.Decibels
+          - org.gnome.Calendar
+          - org.gnome.Contacts
+          - org.gnome.Logs
+          - org.gnome.Maps
+          - org.gnome.Showtime
+          - org.gnome.SimpleScan
 
-  # Enable automatic updates for Flatpaks and bootc
   - type: systemd
     system:
       enabled:
-        - flatpak-system-update.timer
-        - bootc-update.timer
+        - gdm.service
+        - NetworkManager.service
+        - bluetooth.service
         - podman.socket
+        - bootc-update.timer
+      disabled:
+        # stock timer applies updates and reboots; we only stage
+        - bootc-fetch-apply-updates.timer
     user:
       enabled:
-        - flatpak-user-update.timer
+        - podman.socket
 
-  # Set up signing for secure image verification
+  - type: script
+    scripts:
+      - graphical-target.sh
+
   - type: signing

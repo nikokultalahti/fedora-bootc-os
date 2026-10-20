@@ -5,7 +5,5 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/bootc update
-
-[Install]
-WantedBy=multi-user.target
+# Stages the new image; it is applied on the next reboot.
+ExecStart=/usr/bin/bootc upgrade
