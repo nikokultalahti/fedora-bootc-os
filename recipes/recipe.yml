@@ -111,7 +111,7 @@ modules:
   - type: default-flatpaks
     configurations:
       - scope: system
-        notify: true
+        notify: false
         repo:
           name: flathub
           title: Flathub
