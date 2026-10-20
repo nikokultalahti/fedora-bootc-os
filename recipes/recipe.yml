@@ -166,4 +166,6 @@ modules:
     scripts:
       - graphical-target.sh
 
+  - type: initramfs
+
   - type: signing
