@@ -48,7 +48,6 @@ modules:
         - showtime
         - snapshot
         - simple-scan
-        # setup, docs, sharing, extras
         - gnome-initial-setup
         - gnome-tour
         - gnome-user-docs
@@ -66,6 +65,7 @@ modules:
     install:
       packages:
         - flatpak
+        - git
         - google-noto-color-emoji-fonts
         - glibc-all-langpacks
 
