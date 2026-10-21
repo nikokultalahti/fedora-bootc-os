@@ -1,0 +1,25 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/module-list-v1.json
+modules:
+  # Systemd units for staged bootc updates
+  - type: files
+    files:
+      - source: system
+        destination: /
+
+  # gdm, NetworkManager and Bluetooth are already enabled in Silverblue
+  - type: systemd
+    system:
+      enabled:
+        - podman.socket
+        - bootc-update.timer
+      masked:
+        # Only Flathub is used; don't add Fedora's Flatpak remote on first boot
+        - flatpak-add-fedora-repos.service
+        # Fails on composefs roots: the installer writes a '/' entry in
+        # /etc/fstab and the unit can't remount the overlay root.
+        # See bootc-dev/bootc#971 and fedora-silverblue/issue-tracker#605
+        - systemd-remount-fs.service
+    user:
+      enabled:
+        - podman.socket

@@ -6,125 +6,16 @@ description: Fedora Silverblue with a trimmed GNOME, RPM Fusion codecs, Homebrew
 base-image: quay.io/fedora-ostree-desktops/silverblue
 image-version: "44"
 
+# Order matters: modules run top to bottom, each as a cached layer.
+# Rarely changed pieces come first, frequently edited ones last.
 modules:
-  # Systemd units for staged bootc updates
-  - type: files
-    files:
-      - source: system
-        destination: /
-
-  # RPM Fusion (free + nonfree), official release packages straight from the
-  # primary host (no mirror redirect). The version in the URL must match
-  # image-version.
-  - type: dnf
-    install:
-      packages:
-        - https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-44.noarch.rpm
-        - https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-44.noarch.rpm
-
-  # Silverblue already ships a lean GNOME. Remove the few bundled apps we
-  # don't want; other GUI apps are installed from Bazaar when needed.
-  - type: dnf
-    remove:
-      packages:
-        - gnome-software
-        - yelp
-        - malcontent-control
-        - gnome-tour
-        - gnome-user-docs
-        - gnome-user-share
-        - gnome-remote-desktop
-        - rygel
-        - gnome-classic-session
-
-  # Not in the base image
-  - type: dnf
-    install:
-      packages:
-        - git
-        - chezmoi
-
-  # Codecs (RPM Fusion ffmpeg replaces ffmpeg-free) and the multimedia group
-  - type: dnf
-    group-install:
-      install-weak-deps: false
-      exclude:
-        - PackageKit-gstreamer-plugin
-      packages:
-        - multimedia
-    install:
-      allow-erasing: true
-      packages:
-        - ffmpeg
-        - libva
-        - libva-utils
-        # OpenH264 for Firefox (Cisco repo is enabled by default in Fedora)
-        - openh264
-        - gstreamer1-plugin-openh264
-        - mozilla-openh264
-
-  # AMD VA-API hardware video decoding, installed only if the freeworld
-  # build matches the Mesa in the image (see the script for why)
-  - type: script
-    scripts:
-      - mesa-freeworld.sh
-
-  # Homebrew with daily self-update and package upgrades
-  - type: brew
-    auto-update: true
-    auto-upgrade: true
-    update-interval: 1d
-    upgrade-interval: 1d
-    update-wait-after-boot: 10m
-    upgrade-wait-after-boot: 30m
-
-  # All GUI apps come from Flathub
-  - type: default-flatpaks
-    configurations:
-      - scope: system
-        notify: false
-        repo:
-          name: flathub
-          title: Flathub
-        install:
-          - io.github.kolunmi.Bazaar
-          - org.gnome.Firmware
-          - com.github.tchx84.Flatseal
-          - io.github.flattool.Warehouse
-          - page.tesk.Refine
-          - com.mattjakeman.ExtensionManager
-          - io.github.flattool.Ignition
-          - com.tomjwatson.Emote
-          # GNOME apps (what Silverblue's installer preinstalls from Fedora's remote)
-          - org.gnome.baobab
-          - org.gnome.Calculator
-          - org.gnome.Calendar
-          - org.gnome.Decibels
-          - org.gnome.Contacts
-          - org.gnome.font-viewer
-          - org.gnome.TextEditor
-          - org.gnome.Loupe
-          - org.gnome.Logs
-          - org.gnome.Maps
-          - org.gnome.NautilusPreviewer
-          - org.gnome.Papers
-
-  # gdm, NetworkManager and Bluetooth are already enabled in Silverblue
-  - type: systemd
-    system:
-      enabled:
-        - podman.socket
-        - bootc-update.timer
-      masked:
-        # Only Flathub is used; don't add Fedora's Flatpak remote on first boot
-        - flatpak-add-fedora-repos.service
-        # Fails on composefs roots: the installer writes a '/' entry in
-        # /etc/fstab and the unit can't remount the overlay root.
-        # See bootc-dev/bootc#971 and fedora-silverblue/issue-tracker#605
-        - systemd-remount-fs.service
-    user:
-      enabled:
-        - podman.socket
+  - from-file: repos.yml
+  - from-file: gnome.yml
+  - from-file: packages.yml
+  - from-file: codecs.yml
+  - from-file: homebrew.yml
+  - from-file: flatpaks.yml
+  - from-file: system.yml
 
   # Set up signing for secure image verification
   - type: signing
