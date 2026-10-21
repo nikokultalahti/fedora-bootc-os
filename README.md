@@ -1,52 +1,80 @@
-# fedora-bootc-os &nbsp; [![bluebuild build badge](https://github.com/nikokultalahti/fedora-bootc-os/actions/workflows/build.yml/badge.svg)](https://github.com/nikokultalahti/fedora-bootc-os/actions/workflows/build.yml)
+# NikOS &nbsp; [![bluebuild build badge](https://github.com/nikokultalahti/nikos/actions/workflows/build.yml/badge.svg)](https://github.com/nikokultalahti/nikos/actions/workflows/build.yml)
 
-Personal OS image built with [BlueBuild](https://blue-build.org/) on top of Fedora Silverblue 44.
+NikOS is my personal desktop OS: [Fedora Silverblue](https://fedoraproject.org/atomic-desktops/silverblue/) 44, rebuilt every day with [BlueBuild](https://blue-build.org/) and published as a container image at `ghcr.io/nikokultalahti/nikos`.
 
-- GNOME as shipped by Silverblue, minus the apps that come from Flathub instead (installed on first boot through Bazaar's Flathub remote)
-- Firefox as RPM, RPM Fusion codecs and AMD VA-API hardware video decoding
-- Podman, Homebrew (auto-updating) and `chezmoi`
-- Automatic staged updates: a daily `bootc upgrade` that applies on the next reboot
+It is an image-based system. The OS is built in CI, installed or updated as a whole, and rolled back by booting the previous deployment.
 
-## Installation
+## How NikOS differs from Silverblue
 
-> [!WARNING]  
-> [This is an experimental feature](https://www.fedoraproject.org/wiki/Changes/OstreeNativeContainerStable), try at your own discretion.
+Everything not listed here is stock Silverblue: kernel, GNOME, drivers, firmware, plymouth, Flatpak and the ostree/bootc update machinery.
 
-To rebase an existing atomic Fedora installation to the latest build:
+**Removed from the image**
+- GNOME Software, Help (Yelp), GNOME Tour, user docs, Parental Controls, remote desktop, file sharing (Rygel, user share) and the GNOME Classic session.
 
-- First rebase to the unsigned image, to get the proper signing keys and policies installed:
-  ```
-  rpm-ostree rebase ostree-unverified-registry:ghcr.io/nikokultalahti/fedora-bootc-os:latest
-  ```
-- Reboot to complete the rebase:
-  ```
-  systemctl reboot
-  ```
-- Then rebase to the signed image, like so:
-  ```
-  rpm-ostree rebase ostree-image-signed:docker://ghcr.io/nikokultalahti/fedora-bootc-os:latest
-  ```
-- Reboot again to complete the installation
-  ```
-  systemctl reboot
-  ```
+**Added to the image**
+- RPM Fusion (free and nonfree) repositories.
+- Full-codec `ffmpeg` in place of `ffmpeg-free`, the `multimedia` group, and OpenH264 for Firefox.
+- AMD hardware video decoding (`mesa-va-drivers-freeworld`) when RPM Fusion has a build matching Fedora's Mesa; otherwise it is skipped until a later build. See `files/scripts/mesa-freeworld.sh`.
+- `distrobox`, `chezmoi`, and `libva-utils`.
+- udev rules for the ZSA Voyager keyboard, so Oryx and Keymapp can reach it (`files/system/usr/lib/udev/rules.d/50-zsa.rules`).
+- [Homebrew](https://brew.sh/), updating itself and its packages daily.
 
-The `latest` tag will automatically point to the latest build. That build will still always use the Fedora version specified in `recipe.yml`, so you won't get accidentally updated to the next major version.
+**Apps from Flathub**
+- Fedora's Flatpak remote is not set up. On first boot the image installs a default set from Flathub: Bazaar (the app store), Chromium, Flatseal, Warehouse, Refine, Extension Manager, Ignition, Emote, Firmware, and some of the GNOME apps Silverblue normally preinstalls from Fedora's remote (Calculator, Calendar, Contacts, Maps, Text Editor, Papers, Image Viewer and others).
+- Install anything else with Bazaar.
 
-## ISO
+**Updates**
+- Silverblue updates manually by default. NikOS runs `bootc upgrade` daily (`bootc-update.timer`); it downloads and stages the new image, and it takes effect on the next reboot.
 
-You can generate an offline installer ISO with the instructions available [here](https://blue-build.org/how-to/generate-iso/#_top), for example:
+**Smaller changes**
+- `systemd-remount-fs.service` is masked. It fails on every boot on composefs roots, which is a known upstream issue.
+- `/etc/os-release` says NikOS. `ID` is left as `fedora`.
+- Images are signed with cosign.
+
+The configuration is split by topic under `recipes/`: `repos`, `gnome`, `packages`, `codecs`, `homebrew`, `flatpaks`, `system` and `os-release`.
+
+## Install
+
+> [!WARNING]
+> Image-based installs are a relatively new Fedora feature. Back up your data before installing, because the installer erases the disk you choose.
+
+### Fresh install from an ISO
+
+Generate an installer ISO from the published image (see the [BlueBuild guide](https://blue-build.org/how-to/generate-iso/)):
 
 ```bash
-sudo bluebuild generate-iso --iso-name fedora-bootc-os.iso image ghcr.io/nikokultalahti/fedora-bootc-os:latest
+sudo bluebuild generate-iso --iso-name nikos.iso image ghcr.io/nikokultalahti/nikos:latest
 ```
 
- These ISOs cannot unfortunately be distributed on GitHub for free due to large sizes, so for public projects something else has to be used for hosting.
+ISOs are too large to host on GitHub, so this repository does not publish them. After the first boot, GNOME's setup creates your user, and the Flatpaks install in the background once you are online.
+
+### From an existing Fedora Atomic installation
+
+- First rebase to the unsigned image, to get the signing keys and policies installed:
+  ```bash
+  rpm-ostree rebase ostree-unverified-registry:ghcr.io/nikokultalahti/nikos:latest
+  ```
+- Reboot, then rebase to the signed image:
+  ```bash
+  systemctl reboot
+  rpm-ostree rebase ostree-image-signed:docker://ghcr.io/nikokultalahti/nikos:latest
+  ```
+- Reboot again to finish:
+  ```bash
+  systemctl reboot
+  ```
+
+The `latest` tag points to the newest build. Builds always use the Fedora version set in `recipes/recipe.yml`, so you won't be moved to the next major version by accident.
+
+## Notes
+
+- Firefox ships the OpenH264 plugin disabled. If you need/want it, enable it once in `about:addons` under Plugins.
+- The ZSA web configurator (Oryx) needs a Chromium-based browser, hence Chromium is installed by default. Firefox has no WebHID support.
 
 ## Verification
 
-These images are signed with [Sigstore](https://www.sigstore.dev/)'s [cosign](https://github.com/sigstore/cosign). You can verify the signature by downloading the `cosign.pub` file from this repo and running the following command:
+Images are signed with [Sigstore](https://www.sigstore.dev/)'s [cosign](https://github.com/sigstore/cosign). To verify, download `cosign.pub` from this repository and run:
 
 ```bash
-cosign verify --key cosign.pub ghcr.io/nikokultalahti/fedora-bootc-os
+cosign verify --key cosign.pub ghcr.io/nikokultalahti/nikos
 ```

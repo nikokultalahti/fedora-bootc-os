@@ -1,0 +1,12 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/module-v1.json
+#
+# Brand the OS in /etc/os-release (shown e.g. in Settings > About).
+# ID is left as "fedora" on purpose: changing it can break tools that
+# identify the distribution.
+type: os-release
+properties:
+  NAME: NikOS
+  PRETTY_NAME: NikOS (Fedora Silverblue)
+  HOME_URL: https://github.com/nikokultalahti/nikos
+  BUG_REPORT_URL: https://github.com/nikokultalahti/nikos/issues
