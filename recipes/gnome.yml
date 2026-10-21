@@ -1,0 +1,38 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/module-list-v1.json
+modules:
+  # Silverblue ships with GNOME. Remove bundled apps we don't want
+  - type: dnf
+    remove:
+      packages:
+        - gnome-software
+        - yelp
+        - malcontent-control
+        - gnome-tour
+        - gnome-user-docs
+        - gnome-user-share
+        - gnome-remote-desktop
+        - rygel
+        - gnome-classic-session
+  # Install GNOME Flatpaks that we want from Flathub (what Silverblue's installer preinstalls from Fedora's remote)
+  # No GNOME Flatpak will be installed otherwise, as Fedora Flatpak remote is masked
+  - type: default-flatpaks
+    configurations:
+      - scope: system
+        notify: false
+        repo:
+          name: flathub
+          title: Flathub
+        install:
+          - org.gnome.baobab
+          - org.gnome.Calculator
+          - org.gnome.Calendar
+          - org.gnome.Decibels
+          - org.gnome.Contacts
+          - org.gnome.font-viewer
+          - org.gnome.TextEditor
+          - org.gnome.Loupe
+          - org.gnome.Logs
+          - org.gnome.Maps
+          - org.gnome.NautilusPreviewer
+          - org.gnome.Papers

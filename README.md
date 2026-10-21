@@ -1,8 +1,11 @@
 # fedora-bootc-os &nbsp; [![bluebuild build badge](https://github.com/nikokultalahti/fedora-bootc-os/actions/workflows/build.yml/badge.svg)](https://github.com/nikokultalahti/fedora-bootc-os/actions/workflows/build.yml)
 
-See the [BlueBuild docs](https://blue-build.org/how-to/setup/) for quick setup instructions for setting up your own repository based on this template.
+Personal OS image built with [BlueBuild](https://blue-build.org/) on top of Fedora Silverblue 44.
 
-After setup, it is recommended you update this README to describe your custom image.
+- GNOME as shipped by Silverblue, minus the apps that come from Flathub instead (installed on first boot through Bazaar's Flathub remote)
+- Firefox as RPM, RPM Fusion codecs and AMD VA-API hardware video decoding
+- Podman, Homebrew (auto-updating) and `chezmoi`
+- Automatic staged updates: a daily `bootc upgrade` that applies on the next reboot
 
 ## Installation
 
@@ -32,7 +35,13 @@ The `latest` tag will automatically point to the latest build. That build will s
 
 ## ISO
 
-If build on Fedora Atomic, you can generate an offline ISO with the instructions available [here](https://blue-build.org/how-to/generate-iso/#_top). These ISOs cannot unfortunately be distributed on GitHub for free due to large sizes, so for public projects something else has to be used for hosting.
+You can generate an offline installer ISO with the instructions available [here](https://blue-build.org/how-to/generate-iso/#_top), for example:
+
+```bash
+sudo bluebuild generate-iso --iso-name fedora-bootc-os.iso image ghcr.io/nikokultalahti/fedora-bootc-os:latest
+```
+
+ These ISOs cannot unfortunately be distributed on GitHub for free due to large sizes, so for public projects something else has to be used for hosting.
 
 ## Verification
 

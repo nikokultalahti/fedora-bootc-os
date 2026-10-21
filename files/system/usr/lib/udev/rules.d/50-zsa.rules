@@ -1,0 +1,15 @@
+# ZSA keyboards (Voyager): Oryx web flashing / live training and Keymapp.
+# Based on ZSA's Linux guide, trimmed to what a Voyager needs:
+# https://github.com/zsa/wally/wiki/Linux-install
+# Differs from the guide in one way: the hidraw rules use TAG+="uaccess"
+# (access for the user logged in at the seat) instead of GROUP="plugdev",
+# so no extra group or manual usermod is needed. The GROUP="plugdev" part of
+# the USB rules is dropped for the same reason (they are mode 0666 anyway).
+
+# Rules for Oryx web flashing and live training
+KERNEL=="hidraw*", ATTRS{idVendor}=="16c0", TAG+="uaccess"
+KERNEL=="hidraw*", ATTRS{idVendor}=="3297", TAG+="uaccess"
+
+# Keymapp flashing rules for the Voyager
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="3297", MODE:="0666", SYMLINK+="ignition_dfu"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="3297", MODE="0666"

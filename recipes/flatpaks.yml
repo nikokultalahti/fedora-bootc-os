@@ -1,0 +1,20 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/module-v1.json
+# All GUI apps come from Flathub
+type: default-flatpaks
+configurations:
+  - scope: system
+    notify: false
+    repo:
+      name: flathub
+      title: Flathub
+    install:
+      - io.github.kolunmi.Bazaar
+      - org.gnome.Firmware
+      - com.github.tchx84.Flatseal
+      - io.github.flattool.Warehouse
+      - page.tesk.Refine
+      - com.mattjakeman.ExtensionManager
+      - io.github.flattool.Ignition
+      - com.tomjwatson.Emote
+      - org.chromium.Chromium
