@@ -1,9 +1,9 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
 name: fedora-bootc-os
-description: Minimal GNOME desktop on Fedora bootc with podman, Boxes, Homebrew and Flathub apps.
+description: Fedora Silverblue with a trimmed GNOME, RPM Fusion codecs, Homebrew and Flathub apps.
 
-base-image: quay.io/fedora/fedora-bootc
+base-image: quay.io/fedora-ostree-desktops/silverblue
 image-version: "44"
 
 modules:
@@ -13,72 +13,38 @@ modules:
       - source: system
         destination: /
 
-  # RPM Fusion (free + nonfree), official release packages straight from the primary host (no mirror redirect). The version in
-  # the URL must match image-version.
+  # RPM Fusion (free + nonfree), official release packages straight from the
+  # primary host (no mirror redirect). The version in the URL must match
+  # image-version.
   - type: dnf
     install:
       packages:
         - https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-44.noarch.rpm
         - https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-44.noarch.rpm
 
-  # Minimal GNOME: the Fedora gnome-desktop group (with its recommended
-  # packages, as on Fedora Workstation) minus user applications.
-  # Group members and weak deps are both excluded by name.
+  # Silverblue already ships a lean GNOME. Remove the few bundled apps we
+  # don't want; other GUI apps are installed from Bazaar when needed.
   - type: dnf
-    group-install:
-      exclude:
-        # apps (get them from Flathub via Bazaar)
+    remove:
+      packages:
         - gnome-software
-        - gnome-text-editor
         - yelp
-        - baobab
-        - decibels
-        - gnome-boxes
-        - gnome-calculator
-        - gnome-calendar
-        - gnome-characters
-        - gnome-clocks
-        - gnome-connections
-        - gnome-contacts
-        - gnome-font-viewer
-        - gnome-logs
-        - gnome-maps
-        - gnome-system-monitor
-        - gnome-weather
-        - loupe
         - malcontent-control
-        - papers
-        - papers-nautilus
-        - showtime
-        - snapshot
-        - simple-scan
         - gnome-tour
         - gnome-user-docs
         - gnome-user-share
         - gnome-remote-desktop
         - rygel
         - gnome-classic-session
-        - PackageKit-command-not-found
-        - PackageKit-gtk3-module
-      packages:
-        - gnome-desktop
 
-  # Things neither the group nor the bootc base provide
+  # Not in the base image
   - type: dnf
     install:
       packages:
-        - flatpak
         - git
-        - google-noto-color-emoji-fonts
-        - glibc-all-langpacks
+        - chezmoi
 
-  # Firefox as RPM
-  - type: dnf
-    install:
-      packages:
-        - firefox
-
-  # Codecs and AMD hardware video acceleration (RPM Fusion)
+  # Codecs (RPM Fusion ffmpeg replaces ffmpeg-free) and the multimedia group
   - type: dnf
     group-install:
       install-weak-deps: false
@@ -87,18 +53,21 @@ modules:
       packages:
         - multimedia
     install:
+      allow-erasing: true
       packages:
         - ffmpeg
-        - ffmpeg-libs
-        - mesa-va-drivers-freeworld
         - libva
         - libva-utils
         # OpenH264 for Firefox (Cisco repo is enabled by default in Fedora)
         - openh264
         - gstreamer1-plugin-openh264
         - mozilla-openh264
-        - plymouth # For graphical boot screen and encryption password promt
-        - chezmoi
+
+  # AMD VA-API hardware video decoding, installed only if the freeworld
+  # build matches the Mesa in the image (see the script for why)
+  - type: script
+    scripts:
+      - mesa-freeworld.sh
 
   # Homebrew with daily self-update and package upgrades
   - type: brew
@@ -125,35 +94,30 @@ modules:
           - page.tesk.Refine
           - com.mattjakeman.ExtensionManager
           - io.github.flattool.Ignition
-          - io.github.getnf.embellish
           - com.tomjwatson.Emote
-          - org.gnome.Boxes
-          # replacements for apps excluded from the GNOME group
-          - org.gnome.TextEditor
-          - io.missioncenter.MissionCenter
-          - org.gnome.Loupe
+          # GNOME apps (what Silverblue's installer preinstalls from Fedora's remote)
           - org.gnome.baobab
-          - org.gnome.Papers
-          - org.gnome.Decibels
+          - org.gnome.Calculator
           - org.gnome.Calendar
+          - org.gnome.Decibels
           - org.gnome.Contacts
+          - org.gnome.font-viewer
+          - org.gnome.TextEditor
+          - org.gnome.Loupe
           - org.gnome.Logs
           - org.gnome.Maps
-          - org.gnome.Showtime
-          - org.gnome.SimpleScan
+          - org.gnome.NautilusPreviewer
+          - org.gnome.Papers
 
+  # gdm, NetworkManager and Bluetooth are already enabled in Silverblue
   - type: systemd
     system:
       enabled:
-        - gdm.service
-        - NetworkManager.service
-        - bluetooth.service
         - podman.socket
         - bootc-update.timer
-      disabled:
-        # stock timer applies updates and reboots; we only stage
-        - bootc-fetch-apply-updates.timer
       masked:
+        # Only Flathub is used; don't add Fedora's Flatpak remote on first boot
+        - flatpak-add-fedora-repos.service
         # Fails on composefs roots: the installer writes a '/' entry in
         # /etc/fstab and the unit can't remount the overlay root.
         # See bootc-dev/bootc#971 and fedora-silverblue/issue-tracker#605
@@ -162,10 +126,5 @@ modules:
       enabled:
         - podman.socket
 
-  - type: script
-    scripts:
-      - graphical-target.sh
-
-  - type: initramfs
-
+  # Set up signing for secure image verification
   - type: signing
