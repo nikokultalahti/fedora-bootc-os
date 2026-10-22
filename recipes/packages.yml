@@ -6,3 +6,5 @@ modules:
       packages:
         - distrobox
         - chezmoi
+        - nextcloud-client
+        - nextcloud-client-nautilus
