@@ -6,8 +6,7 @@ configurations:
   - scope: system
     notify: false
     repo:
-      name: flathub
-      title: Flathub
+      title: Flathub (system)
     install:
       - io.github.kolunmi.Bazaar
       - org.gnome.Firmware
@@ -16,5 +15,16 @@ configurations:
       - page.tesk.Refine
       - com.mattjakeman.ExtensionManager
       - io.github.flattool.Ignition
+  - scope: user
+    notify: false
+    repo:
+      title: Flathub (user)
+    install:
+      - io.missioncenter.MissionCenter
+      - com.github.rafostar.Clapper
       - com.tomjwatson.Emote
-      - org.chromium.Chromium
+      - be.alexandervanhee.gradia
+      - io.gitlab.adhami3310.Impression
+      - org.gnome.World.PikaBackup
+      - org.libreoffice.LibreOffice
+      - net.donnybeelo.Convey
