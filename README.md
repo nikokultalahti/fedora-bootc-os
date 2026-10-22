@@ -9,7 +9,7 @@ It is an image-based system. The OS is built in CI, installed or updated as a wh
 Everything not listed here is stock Silverblue: kernel, GNOME, drivers, firmware, plymouth, Flatpak and the ostree/bootc update machinery.
 
 **Removed from the image**
-- GNOME Software, Help (Yelp), GNOME Tour, user docs, Parental Controls, remote desktop, file sharing (Rygel, user share) and the GNOME Classic session.
+- GNOME Software, Help (Yelp), GNOME Tour, user docs, Parental Controls, remote desktop, file sharing (Rygel, user share), the GNOME Classic session and GNOME System Monitor.
 
 **Added to the image**
 - RPM Fusion (free and nonfree) repositories.
@@ -17,11 +17,16 @@ Everything not listed here is stock Silverblue: kernel, GNOME, drivers, firmware
 - AMD hardware video decoding (`mesa-va-drivers-freeworld`) when RPM Fusion has a build matching Fedora's Mesa; otherwise it is skipped until a later build. See `files/scripts/mesa-freeworld.sh`.
 - `distrobox`, `chezmoi`, and `libva-utils`.
 - udev rules for the ZSA Voyager keyboard, so Oryx and Keymapp can reach it (`files/system/usr/lib/udev/rules.d/50-zsa.rules`).
-- [Homebrew](https://brew.sh/), updating itself and its packages daily.
+- [Homebrew](https://brew.sh/), updating itself and its packages daily, with its analytics turned off.
 
 **Apps from Flathub**
-- Fedora's Flatpak remote is not set up. On first boot the image installs a default set from Flathub: Bazaar (the app store), Chromium, Flatseal, Warehouse, Refine, Extension Manager, Ignition, Emote, Firmware, and some of the GNOME apps Silverblue normally preinstalls from Fedora's remote (Calculator, Calendar, Contacts, Maps, Text Editor, Papers, Image Viewer and others).
-- Install anything else with Bazaar.
+- Fedora's Flatpak remote is not set up, so every Flatpak comes from Flathub. The image installs a default set on first boot; install anything else with Bazaar.
+- **System-wide:** Bazaar (the app store), Firmware, Flatseal, Warehouse, Refine, Extension Manager and Ignition, plus the GNOME apps Silverblue's own installer would preinstall from Fedora's remote: Disk Usage Analyzer, Calculator, Calendar, Decibels, Contacts, Fonts, Text Editor, Image Viewer, Logs, Sushi (file previews) and Papers.
+- **Per user:** Resources (system monitor), Clapper, Emote, Gradia, Impression, Pika Backup, LibreOffice and Convey. These are installed in each user's home directory instead of system-wide.
+
+**GNOME extensions**
+- Installed at build time: Blur my Shell, AppIndicator and KStatusNotifierItem Support, Night Theme Switcher, Bluetooth Battery Monitor, GSConnect and Caffeine.
+- Removed: the extensions that ship with Silverblue's GNOME (Apps Menu, Background Logo, Launch New Instance, Places Status Indicator and Window List).
 
 **Updates**
 - Silverblue updates manually by default. NikOS runs `bootc upgrade` daily (`bootc-update.timer`); it downloads and stages the new image, and it takes effect on the next reboot.
@@ -69,7 +74,7 @@ The `latest` tag points to the newest build. Builds always use the Fedora versio
 ## Notes
 
 - Firefox ships the OpenH264 plugin disabled. If you need/want it, enable it once in `about:addons` under Plugins.
-- The ZSA web configurator (Oryx) needs a Chromium-based browser, hence Chromium is installed by default. Firefox has no WebHID support.
+- The ZSA web configurator (Oryx) needs a Chromium-based browser. None is preinstalled, so install one (for example Chromium) from Bazaar. Firefox has no WebHID support.
 
 ## Verification
 

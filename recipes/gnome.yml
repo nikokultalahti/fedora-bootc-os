@@ -36,6 +36,7 @@ modules:
           - org.gnome.Logs
           - org.gnome.NautilusPreviewer
           - org.gnome.Papers
+  # Install GNOME extensions
   - type: gnome-extensions
     install:
       - Blur my Shell
@@ -44,6 +45,7 @@ modules:
       - Bluetooth Battery Monitor
       - GSConnect
       - Caffeine
+  # Uninstall default GNOME extensions that come with Silverblue
     uninstall:
       - Apps Menu
       - Background Logo
