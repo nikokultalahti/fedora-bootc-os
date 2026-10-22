@@ -36,3 +36,17 @@ modules:
           - org.gnome.Logs
           - org.gnome.NautilusPreviewer
           - org.gnome.Papers
+  - type: gnome-extensions
+    install:
+      - Blur my Shell
+      - AppIndicator and KStatusNotifierItem Support
+      - Night Theme Switcher
+      - Bluetooth Battery Monitor
+      - GSConnect
+      - Caffeine
+    uninstall:
+      - Apps Menu
+      - Background Logo
+      - Launch New Instance
+      - Places Status Indicator
+      - Window List
