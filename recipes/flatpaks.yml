@@ -20,7 +20,7 @@ configurations:
     repo:
       title: Flathub (user)
     install:
-      - io.missioncenter.MissionCenter
+      - net.nokyan.Resources
       - com.github.rafostar.Clapper
       - com.tomjwatson.Emote
       - be.alexandervanhee.gradia
