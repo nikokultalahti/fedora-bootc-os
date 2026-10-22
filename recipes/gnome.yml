@@ -49,6 +49,6 @@ modules:
       - Background Logo
       - Launch New Instance
       - Places Status Indicator
-      - 602 # Window List
+      - "602" # Window List
       # 602 = the built-in Window List; the name alone also matches a
       # third-party extension on extensions.gnome.org and breaks the module
