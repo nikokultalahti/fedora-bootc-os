@@ -4,6 +4,7 @@
 type: brew
 auto-update: true
 auto-upgrade: true
+brew-analytics: false # disable telemetry
 update-interval: 1d
 upgrade-interval: 1d
 update-wait-after-boot: 10m
