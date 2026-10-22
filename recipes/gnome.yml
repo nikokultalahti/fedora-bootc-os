@@ -1,8 +1,14 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/module-list-v1.json
 modules:
-  # Silverblue ships with GNOME. Remove bundled apps we don't want
+  # Install GSConnect comes from Fedora's packages: the gnome-extensions module can't
+  # install it (it hard-codes paths that aren't writable at build time)
   - type: dnf
+    install:
+      packages:
+        - gnome-shell-extension-gsconnect
+        - nautilus-gsconnect
+    # Silverblue ships with GNOME. Remove bundled apps we don't want
     remove:
       packages:
         - gnome-software
@@ -43,7 +49,6 @@ modules:
       - AppIndicator and KStatusNotifierItem Support
       - Night Theme Switcher
       - Bluetooth Battery Monitor
-      - GSConnect
       - Caffeine
   # Uninstall default GNOME extensions that come with Silverblue
     uninstall:
@@ -51,6 +56,8 @@ modules:
       - Background Logo
       - Launch New Instance
       - Places Status Indicator
-      - "602" # Window List
-      # 602 = the built-in Window List; the name alone also matches a
-      # third-party extension on extensions.gnome.org and breaks the module
+      - "602" # Window List; refer by ID as name alone also matches another extension
+  # Enable all of the extensions (including GSConnect) by default
+  - type: gschema-overrides
+    include:
+      - zz1-extensions.gschema.override
