@@ -21,7 +21,6 @@ configurations:
       title: Flathub (user)
     install:
       - net.nokyan.Resources
-      - com.github.rafostar.Clapper
       - com.tomjwatson.Emote
       - be.alexandervanhee.gradia
       - io.gitlab.adhami3310.Impression
