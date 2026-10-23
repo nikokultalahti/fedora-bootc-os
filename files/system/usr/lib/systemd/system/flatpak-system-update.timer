@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily update of system Flatpaks
+
+[Timer]
+OnBootSec=20m
+OnUnitInactiveSec=1d
+
+[Install]
+WantedBy=timers.target
