@@ -21,8 +21,8 @@ Everything not listed here is stock Silverblue: kernel, GNOME, drivers, firmware
 
 **Apps from Flathub**
 - Fedora's Flatpak remote is not set up, so every Flatpak comes from Flathub. The image installs a default set on first boot; install anything else with Bazaar.
-- **System-wide:** Bazaar (the app store), Firmware, Flatseal, Warehouse, Refine, Extension Manager and Ignition, plus the GNOME apps Silverblue's own installer would preinstall from Fedora's remote: Disk Usage Analyzer, Calculator, Calendar, Decibels, Contacts, Fonts, Text Editor, Image Viewer, Logs, Sushi (file previews) and Papers.
-- **Per user:** Resources (system monitor), Clapper, Emote, Gradia, Impression, Pika Backup, LibreOffice and Convey. These are installed in each user's home directory instead of system-wide.
+- **System-wide:** Bazaar (the app store), Firmware, Flatseal, Warehouse, Refine, Extension Manager and Ignition, plus the GNOME apps Silverblue's own installer would preinstall from Fedora's remote: Disk Usage Analyzer, Calculator, Calendar, Decibels, Contacts, Fonts, Text Editor, Image Viewer, Logs, Sushi (file previews), Papers and Showtime (video player).
+- **Per user:** Resources (system monitor), Emote, Gradia, Impression, Pika Backup, LibreOffice and Convey. These are installed in each user's home directory instead of system-wide.
 
 **GNOME extensions**
 - Installed at build time: Blur my Shell, AppIndicator and KStatusNotifierItem Support, Night Theme Switcher, Bluetooth Battery Monitor, GSConnect and Caffeine.
@@ -30,6 +30,8 @@ Everything not listed here is stock Silverblue: kernel, GNOME, drivers, firmware
 
 **Updates**
 - Silverblue updates manually by default. NikOS runs `bootc upgrade` daily (`bootc-update.timer`); it downloads and stages the new image, and it takes effect on the next reboot.
+- Flatpaks update daily too, with a system timer (`flatpak-system-update.timer`) and a per-user timer (`flatpak-user-update.timer`). GNOME Software, which normally does this, is removed.
+- Homebrew updates itself and upgrades its packages daily.
 
 **Smaller changes**
 - `systemd-remount-fs.service` is masked. It fails on every boot on composefs roots, which is a known upstream issue.

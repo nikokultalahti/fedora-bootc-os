@@ -13,6 +13,7 @@ modules:
       enabled:
         - podman.socket
         - bootc-update.timer
+        - flatpak-system-update.timer
       masked:
         # Only Flathub is used; don't add Fedora's Flatpak remote on first boot
         - flatpak-add-fedora-repos.service
@@ -23,3 +24,4 @@ modules:
     user:
       enabled:
         - podman.socket
+        - flatpak-user-update.timer
